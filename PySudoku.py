@@ -3,7 +3,7 @@ sys.path.append(os.path.join("objects"))
 import SudokuSquare
 from GameResources import *
 
-digits = '123456789'
+cols = '123456789'
 rows = 'ABCDEFGHI'
 
 
@@ -37,7 +37,7 @@ def play(values_list):
                 if y in (0, 1, 2):  startY = (y * 57) + 35
                 if y in (3, 4, 5):  startY = (y * 57) + 100
                 if y in (6, 7, 8):  startY = (y * 57) + 165
-                col = digits[x]
+                col = cols[x]
                 row = rows[y]
                 string_number = values[row + col]
                 if len(string_number) > 1 or string_number == '' or string_number == '.':
