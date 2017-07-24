@@ -25,16 +25,17 @@ def naked_twins(values):
     """
     # Find all instances of naked twins
     for unit in unitlist:
+        # Find boxes in the unit with two possible values
         boxes_with_two_possible_values = [box for box in unit if len(values[box])==2]
-        if len(boxes_with_two_possible_values)==2: 
-            box1 = boxes_with_two_possible_values[0]
-            box2 = boxes_with_two_possible_values[1]
-            if (values[box1] == values[box2]):
+        for b in boxes_with_two_possible_values:
+            # Find if each of those boxes have a twin
+            b_twin = [box for box in boxes_with_two_possible_values if values[box] == values[b] and box != b]
+            if b_twin:
                 # Eliminate the naked twins as possibilities for their peers
-                digits_twins = values[box1]
+                digits_twins = values[b]
                 for digit in digits_twins:
                     for peer in unit:
-                        if peer not in [box1,box2]:
+                        if peer not in [b,b_twin[0]]:
                             values[peer] = values[peer].replace(digit,'')
     return values
 
