@@ -1,44 +1,29 @@
-# Artificial Intelligence Nanodegree
-## Introductory Project: Diagonal Sudoku Solver
+# **Solving Sudoku Puzzles with AI** 
 
-# Question 1 (Naked Twins)
-Q: How do we use constraint propagation to solve the naked twins problem?  
-A: The Naked Twins technique can be used when, in the same unit, two boxes have the same 2 possible values. Since the numbers 1 to 9 should all appear exactly once in each unit, we can eliminate each of those 2 possible values from the possible values of their peers in that same unit.
+Intelligent agent written in Python that can solve any 9x9 regular and diagonal sudoku puzzles using Constraint Propagation and Depth-First Search.
 
-# Question 2 (Diagonal Sudoku)
-Q: How do we use constraint propagation to solve the diagonal sudoku problem?  
-A: A diagonal sudoku is like a regular sudoku, except for these additional constraints: among the two main diagonals, the numbers 1 to 9 should all appear exactly once. We can therefore also eliminate all the values that already appear in those 2 additional units from the possible values of their peers in that same unit.
+A diagonal sudoku is like a regular sudoku, except for these additional constraints: among the two main diagonals, the numbers 1 to 9 should all appear exactly once.
 
-### Install
+All the details about the steps I took to complete this project can be found in this [Jupyter Notebook](https://github.com/vinny-palumbo/SudokuSolver/blob/master/notebook.ipynb)
 
-This project requires **Python 3**.
+### Code to solve a sudoku
 
-We recommend students install [Anaconda](https://www.continuum.io/downloads), a pre-packaged Python distribution that contains all of the necessary libraries and software for this project. 
-Please try using the environment we provided in the Anaconda lesson of the Nanodegree.
+```sh
+from sudokusolver import display,solve
+"""
+Write the sudoku as the concatenation of all the readings of the digits in the rows, taking the rows from top to bottom. Use a . as a placeholder for an empty box
+"""
+sudoku='2.............62....1....7...6..8...3...9...7...6..4...4....8....52.............3'
+display(solve(sudoku)) # add is_diagonal=True to solve() for diagonal sudokus
+```
 
-##### Optional: Pygame
+### Visualize the solution with Pygame
 
-Optionally, you can also install pygame if you want to see your visualization. If you've followed our instructions for setting up our conda environment, you should be all set.
-
-If not, please see how to download pygame [here](http://www.pygame.org/download.shtml).
-
-### Code
-
-* `solution.py` - You'll fill this in as part of your solution.
-* `solution_test.py` - Do not modify this. You can test your solution by running `python solution_test.py`.
-* `PySudoku.py` - Do not modify this. This is code for visualizing your solution.
-* `visualize.py` - Do not modify this. This is code for visualizing your solution.
-
-### Visualizing
+You can also install pygame if you want to see your visualization. You can see how to download pygame [here](http://www.pygame.org/download.shtml).
 
 To visualize your solution, please only assign values to the values_dict using the `assign_value` function provided in solution.py
 
-### Submission
-Before submitting your solution to a reviewer, you are required to submit your project to Udacity's Project Assistant, which will provide some initial feedback.  
+### Environment
 
-The setup is simple.  If you have not installed the client tool already, then you may do so with the command `pip install udacity-pa`.  
-
-To submit your code to the project assistant, run `udacity submit` from within the top-level directory of this project.  You will be prompted for a username and password.  If you login using google or facebook, visit [this link](https://project-assistant.udacity.com/auth_tokens/jwt_login) for alternate login instructions.
-
-This process will create a zipfile in your top-level directory named sudoku-<id>.zip.  This is the file that you should submit to the Udacity reviews system.
+Here is my [environment file](https://github.com/vinny-palumbo/SudokuSolver/blob/master/environment.yaml). To clone my environment execute: 'conda env create -f environment.yaml'
 

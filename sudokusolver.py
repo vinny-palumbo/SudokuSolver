@@ -1,5 +1,32 @@
 assignments = []
 
+# create labels of the boxes
+cols = '123456789'
+rows = 'ABCDEFGHI'
+def cross(A, B):
+    "Cross product of elements in A and elements in B."
+    return [s+t for s in A for t in B]
+boxes = cross(rows, cols)
+
+# create a dictionary containing a list of the 3, 4 or 5 units associated to each box
+row_units = [cross(r, cols) for r in rows]
+column_units = [cross(rows, c) for c in cols]
+square_units = [cross(rs, cs) for rs in ('ABC','DEF','GHI') for cs in ('123','456','789')]
+diagonal_units = [
+        ['A1','B2','C3','D4','E5','F6','G7','H8','I9'],
+        ['I1','H2','G3','F4','E5','D6','C7','B8','A9']
+    ]
+unitlist = row_units + column_units + square_units
+unitlist_diagonal = unitlist + diagonal_units
+units = dict((s, [u for u in unitlist if s in u]) for s in boxes)
+units_diagonal = dict((s, [u for u in unitlist_diagonal if s in u]) for s in boxes)
+
+# create a dictionary containing a list of the 20, 26 or 32 peers associated to each box
+peers = dict((s, set(sum(units[s],[]))-set([s])) for s in boxes)
+peers_diagonal = dict((s, set(sum(units_diagonal[s],[]))-set([s])) for s in boxes)
+
+
+
 def assign_value(values, box, value):
     """
     Please use this function to update your values dictionary!
@@ -39,10 +66,6 @@ def naked_twins(values):
                             values[peer] = values[peer].replace(digit,'')
     return values
 
-def cross(A, B):
-    "Cross product of elements in A and elements in B."
-    return [s+t for s in A for t in B]
-
 def grid_values(grid):
     """
     Convert grid into a dict of {square: char} with '123456789' for empties.
@@ -77,7 +100,7 @@ def display(values):
         if r in 'CF': print(line)
     return
 
-def eliminate(values):
+def eliminate(values, is_diagonal=False):
     """Eliminate values from peers of each box with a single value.
 
     Go through all the boxes, and whenever there is a box with a single value,
@@ -88,14 +111,19 @@ def eliminate(values):
     Returns:
         Resulting Sudoku in dictionary form after eliminating values.
     """
+    if is_diagonal:
+        peers_f = peers_diagonal
+    else:
+        peers_f = peers
+
     solved_values = [box for box in values.keys() if len(values[box]) == 1]
     for box in solved_values:
         digit = values[box]
-        for peer in peers[box]:
+        for peer in peers_f[box]:
             values[peer] = values[peer].replace(digit,'')
     return values
 
-def only_choice(values):
+def only_choice(values, is_diagonal=False):
     """Finalize all values that are the only choice for a unit.
 
     Go through all the units, and whenever there is a unit with a value
@@ -104,7 +132,12 @@ def only_choice(values):
     Input: Sudoku in dictionary form.
     Output: Resulting Sudoku in dictionary form after filling in only choices.
     """
-    for unit in unitlist:
+    if is_diagonal:
+        unitlist_f = unitlist_diagonal
+    else:
+        unitlist_f = unitlist
+
+    for unit in unitlist_f:
         for digit in '123456789':
             # dplaces is a list of boxes from the current unit with 'digit' as one of its possible values
             dplaces = [box for box in unit if digit in values[box]]
@@ -113,7 +146,7 @@ def only_choice(values):
                 values[dplaces[0]] = digit
     return values
 
-def reduce_puzzle(values):
+def reduce_puzzle(values, is_diagonal=False):
     """
     Iterate eliminate() and only_choice(). If at some point, there is a box with no available values, return False.
     If the sudoku is solved, return the sudoku.
@@ -126,9 +159,9 @@ def reduce_puzzle(values):
         # Check how many boxes have a determined value
         solved_values_before = len([box for box in values.keys() if len(values[box]) == 1])
         # Use the Eliminate Strategy
-        values = eliminate(values)
+        values = eliminate(values, is_diagonal)
         # Use the Only Choice Strategy
-        values = only_choice(values)
+        values = only_choice(values, is_diagonal)
         # Check how many boxes have a determined value, to compare
         solved_values_after = len([box for box in values.keys() if len(values[box]) == 1])
         # If no new values were added, stop the loop.
@@ -138,10 +171,10 @@ def reduce_puzzle(values):
             return False
     return values
 
-def search(values):
+def search(values, is_diagonal=False):
     "Using depth-first search and propagation, try all possible values."
     # First, reduce the puzzle using the previous function
-    values = reduce_puzzle(values)
+    values = reduce_puzzle(values, is_diagonal)
     if values is False:
         return False ## Failed earlier
     if all(len(values[box]) == 1 for box in boxes): 
@@ -156,7 +189,7 @@ def search(values):
         if attempt:
             return attempt
 
-def solve(grid):
+def solve(grid, is_diagonal=False):
     """
     Find the solution to a Sudoku grid.
     Args:
@@ -166,14 +199,14 @@ def solve(grid):
         The dictionary representation of the final sudoku grid. False if no solution exists.
     """
     values = grid_values(grid)
-    if search(values):
-        return search(values)
+    if search(values, is_diagonal):
+        return search(values, is_diagonal)
     else:
         return False
 
 if __name__ == '__main__':
     diag_sudoku_grid = '2.............62....1....7...6..8...3...9...7...6..4...4....8....52.............3'
-    display(solve(diag_sudoku_grid))
+    display(solve(diag_sudoku_grid,is_diagonal=True))
 
     try:
         from visualize import visualize_assignments
@@ -183,22 +216,3 @@ if __name__ == '__main__':
         pass
     except:
         print('We could not visualize your board due to a pygame issue. Not a problem! It is not a requirement.')
-
-# create labels of the boxes
-cols = '123456789'
-rows = 'ABCDEFGHI'
-boxes = cross(rows, cols)
-
-# create a dictionary containing a list of the 3, 4 or 5 units associated to each box
-row_units = [cross(r, cols) for r in rows]
-column_units = [cross(rows, c) for c in cols]
-square_units = [cross(rs, cs) for rs in ('ABC','DEF','GHI') for cs in ('123','456','789')]
-diagonal_units = [
-        ['A1','B2','C3','D4','E5','F6','G7','H8','I9'],
-        ['I1','H2','G3','F4','E5','D6','C7','B8','A9']
-    ]
-unitlist = row_units + column_units + square_units + diagonal_units
-units = dict((s, [u for u in unitlist if s in u]) for s in boxes)
-
-# create a dictionary containing a list of the 20, 26 or 32 peers associated to each box
-peers = dict((s, set(sum(units[s],[]))-set([s])) for s in boxes)
