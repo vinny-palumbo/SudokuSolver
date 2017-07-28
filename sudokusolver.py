@@ -1,3 +1,5 @@
+from visualize import visualize_assignments
+
 assignments = []
 
 # create labels of the boxes
@@ -31,6 +33,7 @@ def assign_value(values, box, value):
     """
     Please use this function to update your values dictionary!
     Assigns a value to a given box. If it updates the board record it.
+    Using this function for assigments will enable Pygame for visualization
     """
 
     # Don't waste memory appending actions that don't actually change any values
@@ -63,7 +66,7 @@ def naked_twins(values):
                 for digit in digits_twins:
                     for peer in unit:
                         if peer not in [b,b_twin[0]]:
-                            values[peer] = values[peer].replace(digit,'')
+                            values = assign_value(values, peer, values[peer].replace(digit,''))
     return values
 
 def grid_values(grid):
@@ -89,15 +92,24 @@ def grid_values(grid):
 def display(values):
     """
     Display the values as a 2-D grid.
+    Visualize with Pygame each step the Sudoku Solver made
     Args:
         values(dict): The sudoku in dictionary form
     """
+    # Display the values as a 2-D grid.
     width = 1+max(len(values[s]) for s in boxes)
     line = '+'.join(['-'*(width*3)]*3)
     for r in rows:
         print(''.join(values[r+c].center(width)+('|' if c in '36' else '')
                       for c in cols))
         if r in 'CF': print(line)
+    # Visualize with Pygame each step the Sudoku Solver made
+    try:
+        visualize_assignments(assignments)
+    except SystemExit:
+        pass
+    except:
+        print('We could not visualize your board due to a pygame issue.')
     return
 
 def eliminate(values, is_diagonal=False):
@@ -120,7 +132,7 @@ def eliminate(values, is_diagonal=False):
     for box in solved_values:
         digit = values[box]
         for peer in peers_f[box]:
-            values[peer] = values[peer].replace(digit,'')
+            values = assign_value(values, peer, values[peer].replace(digit,''))
     return values
 
 def only_choice(values, is_diagonal=False):
@@ -143,7 +155,7 @@ def only_choice(values, is_diagonal=False):
             dplaces = [box for box in unit if digit in values[box]]
             # if only one box from the current unit with 'digit' as one of its possible values, assign it the value of 'digit'
             if len(dplaces) == 1:
-                values[dplaces[0]] = digit
+                values = assign_value(values, dplaces[0], digit)
     return values
 
 def reduce_puzzle(values, is_diagonal=False):
@@ -207,12 +219,3 @@ def solve(grid, is_diagonal=False):
 if __name__ == '__main__':
     diag_sudoku_grid = '2.............62....1....7...6..8...3...9...7...6..4...4....8....52.............3'
     display(solve(diag_sudoku_grid,is_diagonal=True))
-
-    try:
-        from visualize import visualize_assignments
-        visualize_assignments(assignments)
-
-    except SystemExit:
-        pass
-    except:
-        print('We could not visualize your board due to a pygame issue. Not a problem! It is not a requirement.')
